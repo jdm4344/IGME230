@@ -1,0 +1,137 @@
+body{
+	font-family: 'Press Start 2P', cursive;
+	background-color: rgb(110, 110, 110);
+}
+
+span.cell{
+		height:8px;
+		width:8px;
+		border:1px solid #ccc; /* actual width & height is 25px because of border */
+		background-color: #ccc;
+		padding:0;
+		margin:0;
+		position:absolute;
+	}
+	
+/* Get rid of the cell border when it is selected */
+span.cellSelected{
+	height:10px;
+	width:10px;
+	background-color: red;
+	padding:0;
+	margin:0;
+	position:absolute;
+}
+
+header{
+	text-align: center;
+}
+
+h1{
+	font-size:1.3em;
+	top: 0;
+	left:800px;
+}
+
+li{
+	padding: 2px;
+}
+
+/* ID's */
+#gridContainer{
+	top:5px;
+	left:5px;
+	position: relative;
+	width: 750px;
+	margin: auto;
+	padding: 10px;
+}
+
+#dropdown{
+	position: relative;
+	top: 2%;
+	left:800px;
+}
+
+#dropdown select{
+	position: relative;
+	display: block;
+	margin-top: 15px;
+}
+
+#buttons{
+	position: relative;
+	top: 2%;
+	left:800px;
+}
+
+#buttons button{
+	position: relative;
+	display: block;
+	margin-top: 15px;
+}
+
+#rate{
+	position: relative;
+	display: block;
+	margin-top: 15px;
+}
+
+#instructions{
+	height: 275px;
+	margin: auto;
+	max-width: 800px;
+    border-left: none;
+	border-right: none; 
+	text-align: center;
+	padding-top: 1%;
+}
+
+/* Classes */
+.centering{
+	top:5px;
+	left:5px;
+	position: relative;
+	width: 750px;
+	margin: auto;
+	padding: 10px;
+}
+
+.contentBreak{
+    color: #0c1821;
+    text-align: center;
+    border: 2px solid black;
+    border-left: none;
+    border-right: none; 
+    background-color: red;
+	padding: 10px;
+}
+
+.main{
+	height: 450px;
+	margin: auto;
+	max-width: 800px;
+    border-left: none;
+    border-right: none; 
+}
+
+/* Nav specific link formatting*/
+nav a:link{
+    text-decoration: none;
+    color: blue;
+    font-size: 1.5em;
+    text-shadow: -2px 2px white;
+}
+
+nav a:active{
+    color: blue;    
+}
+
+nav a:visited{
+    color: blue;
+}
+
+nav a:hover{
+    color: white;
+    text-shadow: -1px 1px #0c1821;
+}

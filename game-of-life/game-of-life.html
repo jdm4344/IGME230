@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Jordan Machalek's Pixel Life</title>
+	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+	<script src="lifeworld.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Pixel Life!</h1>
+        <h3 id="byline">A Web DOM Project by Jordan Machalek</h3>
+    </header>
+    
+    <section>
+        <nav class="contentBreak">
+            <a href="game-of-life.html">| Pixel Life!</a>
+            <a href="documentation.html" id="current">| Documentation |</a>
+        </nav>
+    </section>
+
+    <section class="main">
+        <div id="gridContainer"></div>
+		
+		<div id="dropdown">
+			<select id="colorChooser">
+				<option value="aqua">Aqua</option>
+				<option value="Bisque">Bisque</option>
+				<option value="black">Black</option>
+				<option value="blue">Blue</option>
+				<option value="brown">Brown</option>
+				<option value="chocolate">Chocolate</option>
+				<option value="cyan">Cyan</option>
+				<option value="DarkGray">Dark Gray</option>
+				<option value="green">Green</option>
+				<option value="red" selected>Red</option>
+				<option value="magenta">Magenta</option>
+				<option value="orange">Orange</option>
+				<option value="tan">Tan</option>
+				<option value="white">White</option>
+				<option value="wheat">Wheat</option>
+				<option value="WhiteSmoke">WhiteSmoke </option>
+				<option value="yellow">Yellow</option>
+			</select>
+
+			<input id="rate" type="text" size="5" maxlength="3" autofocus value="12">
+		</div>
+
+		<div id="buttons">
+			<button id="set">Set Rate</button>
+			<button id="pause">Pause</button>
+			<button id="play">Play</button>
+			<button id="step">Step</button>
+			<button id="random">Random</button>
+			<button id="clear">Clear</button>
+		</div>
+
+
+		<script>
+			//1
+			const numCols = 70;
+			const numRows = 40;
+			const cellWidth = 10;
+			const cellSpacing = 1;
+			//2
+			const container = document.querySelector("#gridContainer");
+			//3
+			const span = document.createElement('span');
+			span.className = 'cell';
+			//4
+			const cells = [];
+			//Functionality variables
+			let playing = false;
+			//Gets rate for game to advance
+			let rate = document.querySelector("#rate").value;
+		
+			//5
+			for(let row = 0; row < numRows; row++)
+			{
+				cells.push([]);
+				for(let col = 0; col < numCols; col++)
+				{
+					let cell = span.cloneNode();
+					cell.style.left = `${col * (cellWidth + cellSpacing)}px`;
+					cell.style.top = `${row * (cellWidth + cellSpacing)}px`;
+					container.appendChild(cell);
+					cells[row][col] = cell;
+				}
+			}
+		
+			//6
+			let color = "red";
+		
+			//7
+			container.onclick = fillCell;
+		
+			//8
+			function fillCell(e)
+			{
+				let rect = container.getBoundingClientRect();
+				let mouseX = e.clientX - rect.left;
+				let mouseY = e.clientY - rect.top;
+				let columnWidth = cellWidth + cellSpacing;
+				let col = Math.floor(mouseX / columnWidth);
+				let row = Math.floor(mouseY / columnWidth);
+				let selectedCell = cells[row][col];
+				selectedCell.style.backgroundColor = color;
+				//Set the appropriate cell in the world array
+				lifeworld.world[row][col] = 1;
+			}
+		
+			//9
+			let mouseIsDown = false;
+		
+			//10
+			//Fills cells that the mouse hovers over when LMB is depressed
+			container.onmousemove = (e) =>
+			{
+				e.preventDefault();
+				if(mouseIsDown) fillCell(e);
+			};
+		
+			//11
+			//Checks for the LMB being pressed
+			container.onmousedown = (e) =>
+			{
+				e.preventDefault();
+				mouseIsDown = true;
+			};
+		
+			//12
+			//Checks for the LMB being up
+			window.onmouseup = (e) =>
+			{
+				e.preventDefault();
+				mouseIsDown = false;
+			};
+		
+			//13
+			//Updates color for pixels in the grid
+			document.querySelector("#colorChooser").onchange = (e) =>
+			{
+				color = e.target.value;
+			};
+		
+			//Life Stuff
+			//1
+			let lastUpdate = performance.now();
+			//2
+			let lastFrame = performance.now();
+			//3
+			let maxFrameDelay = 1000/12;
+			//4
+			lifeworld.init(numCols, numRows);
+		
+			//6
+			//Handles the continous simulation of the game
+			function loop(timestamp)
+			{
+				if(playing == true)
+				{
+					requestAnimationFrame(loop);
+					lastUpdate = timestamp;
+					if(timestamp - lastFrame > maxFrameDelay)
+					{
+						lastFrame = timestamp;
+						lifeworld.step();
+						updateGrid();
+					}
+				}
+			}
+		
+			//7
+			//Update the state of the grid based on the underlying array
+			function updateGrid()
+			{
+				for(let row = 0; row < numRows; row++)
+				{
+					for(let col = 0; col < numCols; col++)
+					{
+						let element = cells[row][col];
+						if(lifeworld.world[row][col] == 1)
+						{
+							element.style.backgroundColor = color;
+						}
+						else
+						{
+							element.style.backgroundColor = "rgb(204, 204, 204)";
+						}
+					}
+				}
+			}
+		
+			//Functionality for buttons
+			let pauseButton = document.getElementById("pause");
+			let playButton = document.getElementById("play");
+			let stepButton = document.getElementById("step");
+			let rdmButton = document.getElementById("random");
+			let clearButton = document.getElementById("clear");
+			let rateButton = document.getElementById("set");
+		
+			//Button Functions
+			//Pause the simulation
+			function pauseLife()
+			{	
+				if(playing == true) //check just in case to potentially avoid issues
+				{
+					playing = false;
+				}
+			}
+		
+			//Play the simulation
+			function playLife()
+			{
+				if(playing == false) //check just in case to potentially avoid issues
+				{
+					//console.log("now playing");
+					playing = true;
+		
+					loop(performance.now);
+				}
+			}
+			
+			//Advance to the next step
+			function nextStep()
+			{
+				let wasPlaying = playing;
+				//console.log(wasPlaying);
+		
+				lifeworld.step();
+				updateGrid();
+		
+				if(wasPlaying == true)
+				{
+					playing = true;
+				}
+				else if(wasPlaying == false)
+				{
+					playing = false;
+				}
+			}
+		
+			//Used to set up the board with a random generation of pixels
+			function doSetup()
+			{
+				lifeworld.randomSetup();
+				nextStep();
+			}
+		
+			//Clears the board
+			function clear()
+			{
+				lifeworld.world = lifeworld.buildArray();
+				lifeworld.worldBuffer = lifeworld.buildArray();
+				//updateGrid();
+				nextStep();
+			}
+
+			//Change the rate at which the simulation is operating based on input
+			function updateRate()
+			{
+				rate = document.querySelector("#rate").value;
+
+				maxFrameDelay = 1000/rate;
+			}
+		
+			//Add event listeners for buttons
+			pauseButton.addEventListener("click", pauseLife);
+			playButton.addEventListener("click", playLife);
+			stepButton.addEventListener("click", nextStep);
+			rdmButton.addEventListener("click", doSetup);
+			clearButton.addEventListener("click", clear);
+			rateButton.addEventListener("click", updateRate);
+		</script>
+	</section>
+	
+	<div id="instructions">
+		How to use:
+		<ul>
+			<li>Click on blocks in the grid to occupy it</li>
+			<li>Use the drop-down menu to change their color</li>
+			<li>Change the number in the text box to adjust the rate of the simulation</li>
+			<li>The step button will advance the simulation when paused</li>
+			<li>The random button will randomly add new pixels to the grid</li>
+		</ul>
+	</div>
+    
+    <footer class="contentBreak">
+
+        Page &copy; 2017 Jordan Machalek.
+    </footer>
+</body>
+</html>
